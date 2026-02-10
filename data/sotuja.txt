@@ -1,0 +1,72 @@
+Tervetuloa! 
+Alla on Testidataa Linux-kurssin tehtäviä varten.
+Tsemppiä kokeiluihin!
+
+Asiakastiedot:
+Matti Meikäläinen, hetu 131052-308T, osoite Helsinki
+Liisa Virtanen 010203A456N työskentelee Espoossa
+Jussi Testaaja (150390+999X) ei vastannut puhelimeen
+
+Virheellisiä mutta lähes oikeita:
+131052308T        # puuttuu välimerkki
+13-1052-308T      # väärä muoto
+131052-30BT       # kirjain numeron tilalla
+131052-308        # tarkistusmerkki puuttuu
+131052_308T       # väärä erotin
+010203*456N       # väärä vuosisatamerkki
+
+Sekalaista dataa:
+ID: 123456-7890
+Syntynyt: 13.10.52
+Koodi: ABC131052-308TXYZ
+hetu=010203A456N;
+testihetu:150390+999X,
+
+Lisää rivejä:
+Anna Malli 311299-888Y
+Pekka Esimerkki 010101A001A
+Random string 999999-999Z
+010203A456        # puuttuu loppu
+
+Sähköpostiosoitteita:
+admin@company.com
+etunimi.sukunimi@domain.fi
+user123@test-domain.org
+asiakas@palvelu.co.uk
+
+Virheellisiä sähköposteja:
+matti.meikalainen@.fi
+liisa@yritys
+@domain.com
+user@@example.com
+testi.email.domain.com
+name@domain,com
+name@domain..fi
+
+Verkko- ja lokitietoja:
+Yhteys IP-osoitteesta 192.168.1.1 onnistui
+Ping kohteeseen 8.8.8.8 OK
+Sisäinen osoite 10.0.0.254
+Reititin: 172.16.0.1
+
+Virheellisiä IPv4-osoitteita:
+256.100.50.25
+192.168.1
+192.168.1.999
+123.045.067.089
+192.168.1.1.1
+999.999.999.999
+abc.def.ghi.jkl
+192,168,1,1
+
+Sekalaista dataa:
+ID: 123456-7890
+Koodi: ABC131052-308TXYZ
+hetu=010203A456N;
+email=info@company.com;
+ip=192.168.0.100;
+
+Lisää rivejä:
+Anna Malli 311299-888Y anna.malli@mail.fi IP 203.0.113.5
+Pekka Esimerkki 010101A001A pekka@esimerkki..fi 300.1.1.1
+Random string testi@test@domain.com 192.168.one.1
