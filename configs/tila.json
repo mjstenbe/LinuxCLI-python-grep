@@ -26,5 +26,9 @@
   "8": {
     "status": "oikein",
     "student_cmd": "grep 'login successful' data/log.txt | grep '08:' | wc -l"
+  },
+  "7": {
+    "status": "oikein",
+    "student_cmd": "grep -E '\\b[A-Z][a-zA-Z]*\\.' data/kirja.txt"
   }
 }

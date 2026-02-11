@@ -9,6 +9,7 @@
 2026-02-10 08:35:44 INFO: Backup completed successfully
 2026-02-10 08:37:00 User: Anna logout
 2026-02-10 08:40:21 Error: Could not write file /tmp/report.csv
+2026-02-10 08:44:50 WARNING: Possible data breach detected. (user: root@iki.fi)
 2026-02-10 08:45:15 WARNING: High memory usage detected
 2026-02-10 08:50:00 User: Mika login successful
 2026-02-10 08:52:45 User: Mika logout
@@ -23,3 +24,4 @@
 2026-02-10 09:20:30 WARNING: Low battery detected
 2026-02-10 09:25:12 User: Anna login successful
 2026-02-10 09:27:45 User: Anna logout
+2026-02-10 09:37:45 User: webmaster@sci.fi login succesful

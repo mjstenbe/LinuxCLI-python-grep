@@ -5,80 +5,147 @@ import json
 import os
 import sys
 import base64
+from pathlib import Path
+from typing import List, Tuple, Dict, Any, Optional
 
-TEHTAVAT_TIEDOSTO = "app/tehtavat.txt.enc"
-TILA_TIEDOSTO = "app/tila.json"
+# Ladataan konfiguraatio `configs/config.json`. Jos sitä ei ole,
+# käytetään kovakoodattuja oletuksia.
+CONFIG_PATH = Path("configs/config.json")
 
-SALLITUT_KOMENNOT = ("grep", "wc", "sort", "uniq", "head", "tail", "cat")
+def load_config(path: Path) -> Dict[str, Any]:
+    defaults = {
+        "tehtavat_tiedosto": "data/tasks/tehtavat.txt.enc",
+        "tila_tiedosto": "configs/tila.json",
+        "results_file": "output/results.json",
+        "timeout_seconds": 3,
+        "allowed_commands": ["grep", "wc", "sort", "uniq", "head", "tail", "cat"],
+    }
+    if not path.exists():
+        return defaults
+    try:
+        cfg = json.loads(path.read_text(encoding="utf-8"))
+        # merge defaults with provided config
+        for k, v in defaults.items():
+            cfg.setdefault(k, v)
+        return cfg
+    except Exception:
+        return defaults
+
+
+CONFIG = load_config(CONFIG_PATH)
+
+TEHTAVAT_TIEDOSTO = CONFIG["tehtavat_tiedosto"]
+TILA_TIEDOSTO = CONFIG["tila_tiedosto"]
+RESULTS_FILE = CONFIG["results_file"]
+TIMEOUT_SECONDS = int(CONFIG.get("timeout_seconds", 3))
+SALLITUT_KOMENNOT = tuple(CONFIG.get("allowed_commands", []))
 
 # ---------- Apufunktiot ----------
 
-def lue_tehtavat(tiedosto):
-    tehtavat = []
-    
-    # Lue salattua tiedostoa ja pura base64
-    with open(tiedosto, 'r') as f:
-        encoded = f.read()
-    
-    decoded = base64.b64decode(encoded).decode('utf-8')
-    lines = decoded.split('\n')
+def lue_tehtavat(tiedosto: str) -> List[Tuple[str, str]]:
+    """Lue tehtävät tiedostosta.
+
+    Tiedosto voi olla base64-enkoodattu tai tavallinen tekstitiedosto.
+    Tehtäväformaatti: kuvaus aloitetaan merkillä '#' ja seuraava
+    ei-tyhjä rivi on oikea komento. Kommenttirivit alkavat '---' ja ohitetaan.
+    Palauttaa listan `(kuvaus, oikea_komento)` -tupleja.
+    """
+    p = Path(tiedosto)
+    if not p.exists():
+        return []
+
+    raw = p.read_text(encoding='utf-8')
+
+    # Yritä dekoodata base64:lla, mutta jos epäonnistuu, käytä raakatekstiä
+    try:
+        decoded = base64.b64decode(raw).decode('utf-8')
+    except Exception:
+        decoded = raw
+
+    lines = decoded.splitlines()
+    tehtavat: List[Tuple[str, str]] = []
 
     i = 0
-    while i < len(lines):
+    n = len(lines)
+    while i < n:
         line = lines[i].strip()
         if not line:
             i += 1
             continue
 
-        # Uusi muoto: rivi alkaa '#' -> kuvaus, seuraava ei-tyhjä rivi on oikea vastaus
-        if line.startswith("#"):
+        # Ohita kommenttirivit jotka alkavat '---'
+        if line.startswith('---'):
+            i += 1
+            continue
+
+        # Uusi muoto: kuvaus-rivi alkaa '#'
+        if line.startswith('#'):
             kuvaus = line.lstrip('#').strip()
+            # etsi seuraava ei-tyhjä rivi komennoksi
             j = i + 1
-            while j < len(lines) and not lines[j].strip():
+            while j < n and not lines[j].strip():
                 j += 1
-            oikea = lines[j].strip() if j < len(lines) else ""
+            oikea = lines[j].strip() if j < n else ""
             tehtavat.append((kuvaus, oikea))
             i = j + 1
             continue
 
-        # Vanha muoto (säilytetään taaksepäin yhteensopivuus)
-        if ":::" in line:
-            kuvaus, oikea = map(str.strip, line.split(":::", 1))
-            tehtavat.append((kuvaus, oikea))
-
+        # Muoto: kuvaus on jo käsitelty yllä (#-rivinä); muuten ohitetaan
         i += 1
 
     return tehtavat
 
 
-def turvallinen_komento(cmd):
-    return cmd.split()[0] in SALLITUT_KOMENNOT
+def turvallinen_komento(cmd: str) -> bool:
+    """Tarkista, että komento käyttää vain sallittuja ohjelmia.
+
+    Sallitaan putkitetut ja ketjutetut komennot (esim. "grep ... | wc -l").
+    Tarkistus hajottaa komentorivin pipe-merkistä ja varmistaa, että
+    jokaisen vaiheen ensimmäinen ohjelma on sallittujen listalla.
+    """
+    # Jaa putket erillisiksi vaiheiksi
+    for stage in (s.strip() for s in cmd.split('|')):
+        if not stage:
+            return False
+        try:
+            prog = shlex.split(stage, posix=True)[0]
+        except Exception:
+            return False
+        if prog not in SALLITUT_KOMENNOT:
+            return False
+    return True
 
 
 def aja_komento(cmd):
     try:
+        # Käytä timeout-arvoa konfiguraatiosta
         res = subprocess.run(
             cmd,
             shell=True,
             capture_output=True,
             text=True,
-            timeout=3
+            timeout=TIMEOUT_SECONDS,
         )
+        # Palauta stdout ilman loppurivejä
         return res.stdout.strip()
     except Exception as e:
         return f"(virhe: {e})"
 
 
 def lataa_tila():
-    if os.path.exists(TILA_TIEDOSTO):
-        with open(TILA_TIEDOSTO, encoding="utf-8") as f:
-            return json.load(f)
+    p = Path(TILA_TIEDOSTO)
+    if p.exists():
+        try:
+            return json.loads(p.read_text(encoding='utf-8'))
+        except Exception:
+            return {}
     return {}
 
 
 def tallenna_tila(tila):
-    with open(TILA_TIEDOSTO, "w", encoding="utf-8") as f:
-        json.dump(tila, f, ensure_ascii=False, indent=2)
+    p = Path(TILA_TIEDOSTO)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(tila, ensure_ascii=False, indent=2), encoding='utf-8')
 
 # ---------- CI / CHECK ----------
 
@@ -140,9 +207,8 @@ def check_mode():
     results = {"score": oikein, "total": yhteensa, "per_task": per_task}
 
     # Kirjoita tulos tiedostoon ja stdoutiin
-    results_file = "app/results.json"
     try:
-        with open(results_file, "w", encoding="utf-8") as f:
+        with open(RESULTS_FILE, "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
@@ -191,7 +257,7 @@ def interactive_mode():
         kuvaus, oikea = tehtavat[i]
 
         print(f"\n📝 Tehtävä {i+1}/{len(tehtavat)}")
-        print(kuvaus)
+        print(f"{i+1}. {kuvaus}")
 
         cmd = input("💻 Komento (skip / exit / lista): ").strip()
 
@@ -237,13 +303,13 @@ def interactive_mode():
                     else:
                         status_msg = "⏳ Ei vastattu"
 
-                print(f"{status_msg:<15} {tehtavat[j][0]}")
+                print(f"{status_msg:<15} {j+1}. {tehtavat[j][0]}")
             print()
             continue
 
         if cmd == "skip":
             skipped_this_session.add(i)
-            print(f"⏭️  Tehtävä {i+1} skipittu. Seuraavaan...")
+            print(f"⏭️  Tehtävä {i+1} skipattu. Seuraavaan...")
             continue
 
         if not turvallinen_komento(cmd):

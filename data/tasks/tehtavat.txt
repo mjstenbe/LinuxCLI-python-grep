@@ -1,61 +1,58 @@
-# data/sotuja.txt
+--- GREP- harjoituksia
+# Etsi kaikkien asiakkaiden etunimet tiedostosta data/asiakastiedot.txt
+grep '^Asiakas:' data/asiakastiedot.txt 
 
-# 1. Etsi suomalaiset sosiaaliturvatunnukset tiedostosta data/sotuja.txt
-grep -E '[0-9]{6}[+-A][0-9]{3}[0-9A-Z]' data/sotuja.txt
+# Etsi pelkät puhelinnumerot tiedostosta data/asiakastiedot.txt (huomaa että muoto vaihtelee)
+grep -Eo '[0-9]{2,3}[ -]?[0-9]{3}[ -]?[0-9]{3,4}' data/asiakastiedot.txt
 
-# 2. Etsi kaikki IPv4-osoitteet tiedostosta data/sotuja.txt. Riittää että löydät oikein muotoiset numerosarjat (esim. 123.123.123.123).
-grep -E '([0-9]{1,3}\.){3}[0-9]{1,3}' data/sotuja.txt
+-- Tämä on kommentti
 
-# 3. Tulosta kaikki sähköpostiosoitteet, jotka eivät pääty .com-päätteeseen tiedostosta data/sotuja.txt
-grep -E -v '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com\b' data/sotuja.txt
+# Etsi suomalaiset sosiaaliturvatunnukset tiedostosta data/asiakastiedot.txt
+grep -E '[0-9]{6}[+-A][0-9]{3}[0-9A-Z]' data/asiakastiedot.txt
 
+# Etsi kaikki IPv4-osoitteet tiedostosta data/asiakastiedot.txt. Riittää että löydät oikein muotoiset numerosarjat (esim. 123.123.123.123).
+grep -E '([0-9]{1,3}\.){3}[0-9]{1,3}' data/asiakastiedot.txt
 
-# data/kirja.txt
+# Tulosta kaikki sähköpostiosoitteet, jotka eivät pääty .com-päätteeseen tiedostosta data/asiakastiedot.txt
+grep -E -v '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com\b' data/asiakastiedot.txt
 
-# 4. Etsi sanat asianajaja, poliisi, lääkäri yhdellä komennolla tiedostosta data/kirja.txt
+#Etsi sanat asianajaja, poliisi, lääkäri yhdellä komennolla tiedostosta data/kirja.txt
 grep -E 'asianajaja|poliisi|lääkäri' data/kirja.txt
 
-# 5. Tulosta rivit, jotka alkavat sanalla "että" tiedostosta data/kirja.txt
+# Tulosta rivit, jotka alkavat sanalla "että" tiedostosta data/kirja.txt
 grep '^että' data/kirja.txt
 
-# 6. Laske "Tohtori Jekyll" esiintymät tiedostosta data/kirja.txt
+# Laske "Tohtori Jekyll" esiintymät tiedostosta data/kirja.txt
 grep -o 'Tohtori Jekyll' data/kirja.txt | wc -l
 
-# 7. Tulosta rivit, joissa EI esiinny sanoja elämä, ei, kuolema tiedostosta data/kirja.txt
+# rivit, joissa EI esiinny sanoja elämä, ei, kuolema tiedostosta data/kirja.txt
 grep -n -v -E 'elämä|ei|kuolema' data/kirja.txt
 
-# 8. Etsi tiedostosta data/kirja.txt kaikki rivit, joissa esiintyy sana, joka alkaa isolla kirjaimella ja päättyy pisteeseen
+# Etsi tiedostosta data/kirja.txt kaikki rivit, joissa esiintyy sana, joka alkaa isolla kirjaimella ja päättyy pisteeseen
 grep -E '\b[A-Z][a-zA-Z]*\.' data/kirja.txt
 
-
-# data/log.txt
-
-# 9. Etsi kaikki rivit, jotka sisältävät sanan 'Error' tiedostosta data/log.txt
+# Etsi kaikki rivit, jotka sisältävät sanan 'Error' tiedostosta data/log.txt
 grep 'Error' data/log.txt
 
-# 10. Tulosta rivit, joissa on sana “Warning”, isoilla tai pienillä kirjaimilla tiedostosta data/log.txt
+# Tulosta rivit, joissa on sana “Warning”, isoilla tai pienillä kirjaimilla tiedostosta data/log.txt
 grep -i 'warning' data/log.txt
 
-# 11. Tulosta rivit, joissa on sana “login” tai “logout” tiedostosta data/log.txt
+# Tulosta rivit, joissa on sana “login” tai “logout” tiedostosta data/log.txt
 grep -E 'login|logout' data/log.txt
 
-# 12. Tulosta vain rivit, jotka eivät sisällä sanaa “success” tiedostosta data/log.txt
+# Tulosta vain rivit, jotka eivät sisällä sanaa “success” tiedostosta data/log.txt
 grep -v 'success' data/log.txt
 
-# 13. Tulosta rivien numerot, joissa esiintyy sana “failed” tiedostosta data/log.txt
+# Tulosta rivien numerot, joissa esiintyy sana “failed” tiedostosta data/log.txt
 grep -n 'failed' data/log.txt
 
-# 14. Selvitä grep-komennolla kuinka monta kertaa käyttäjä Mika on kirjautunut sisään (login) tiedostosta data/log.txt
+# Selvitä grep-komennolla kuinka monta kertaa käyttäjä Mika on kirjautunut sisään (login) tiedostosta data/log.txt
 grep 'User: Mika login successful' data/log.txt | wc -l
 
-# 15. Laske grepin avulla onnistuneet kirjautumiset kello 08:00–09:00 välillä tiedostosta data/log.txt
+# Laske grepin avulla onnistuneet kirjautumiset kello 08:00–09:00 välillä tiedostosta data/log.txt
 grep 'login successful' data/log.txt | grep '08:' | wc -l
 
 
-# muut tiedostot
-
-# 16. Etsi kaikki sähköpostiosoitteet hakemistosta data olevista tiedostoista
+# Etsi kaikki sähköpostiosoitteet hakemistosta data olevista tiedostoista
 grep -R -E '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' ./data/*
 
-# 17. Hae nimipäiväsankarit ja poista HTML-tagit
-grep -i 'nimipäivä' almanakka.html | sed 's/<[^>]*>//g'
