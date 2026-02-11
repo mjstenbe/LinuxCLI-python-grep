@@ -1,0 +1,26 @@
+# 1. Korvaa sana lääkäri sanalla puoskari
+sed 's/lääkäri/puoskari/g' data/kirja.txt
+
+# 2. Poista rivit, joilla sana maailma
+sed '/maailma/d' data/kirja.txt
+
+# 3. Lisää lainausmerkit sanan Enfield ympärille
+sed 's/Enfield/"Enfield"/g' data/kirja.txt
+
+# 4. Poista tyhjät rivit tiedostosta
+sed '/^$/d' data/kirja.txt
+
+# 5. Etsi ja korvaa kolme eri sanaa yhdellä komennolla
+sed -E 's/sana1|sana2|sana3/korvattu/g' data/kirja.txt
+
+# 6. Korvaa kaikki numerot sanalla NUMERO
+sed -E 's/[0-9]+/NUMERO/g' data/kirja.txt
+
+# 7. Lisää rivinumero jokaisen rivin alkuun
+sed = data/kirja.txt | sed 'N;s/\n/ /'
+
+# 8. Poista rivit 200–300
+sed '200,300d' data/kirja.txt
+
+# 9. Korvaa kaikki sanat, jotka alkavat isolla kirjaimella sanalla [LUOKKA]
+sed -E 's/\b[A-Z][a-zA-Z]*/[LUOKKA]/g' data/kirja.txt

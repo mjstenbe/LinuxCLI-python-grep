@@ -1,0 +1,26 @@
+# 1. Tulosta etunimi ja puhelinnumero (CSV)
+awk -F';' '{print $1 " (" $4 ")"}' data/users.csv
+
+# 2. Tulosta vain käyttäjien etunimi ja sukunimi (CSV)
+awk -F';' '{print $1, $2}' data/users.csv
+
+# 3. Tulosta kaikki käyttäjät, joiden maa on Finland
+awk -F';' '$3=="Finland"{print $1, $2, $3}' data/users.csv
+
+# 4. Tulosta nimi, katuosoite ja maa ja järjestä maan mukaan
+awk -F';' '{print $1 "\t" $2 "\t" $3}' data/users.csv | sort -k3
+
+# 5. Laske montako vastasi Kyllä ja Ei
+awk -F',' '{kylla+=$2; ei+=$3} END {print "Kyllä:", kylla, "Ei:", ei}' data/survey.csv
+
+# 6. Laske montako käyttäjää on kustakin maasta
+awk -F';' '{count[$3]++} END {for (m in count) print m, count[m]}' data/users.csv
+
+# 7. Tulosta käyttäjät, joiden puhelinnumero alkaa 040
+awk -F';' '$4 ~ /^040/ {print $1, $4}' data/users.csv
+
+# 8. Tulosta käyttäjien etunimi, sukunimi ja maa, ja järjestä ensin maan ja sitten etunimen mukaan
+awk -F';' '{print $3 "\t" $1 "\t" $2}' data/users.csv | sort -k1,1 -k2,2
+
+# 9. Laske keskimääräinen ikä (kolmas kenttä) CSV-tiedostosta
+awk -F',' '{sum+=$3; count++} END {if(count>0) print "Keski-ikä:", sum/count}' data/users.csv
