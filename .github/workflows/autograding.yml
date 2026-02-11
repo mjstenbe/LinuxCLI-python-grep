@@ -6,6 +6,9 @@ jobs:
   autograde:
     runs-on: ubuntu-latest
 
+    env:
+      RESULTS_REPO_TOKEN: ${{ secrets.RESULTS_REPO_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -16,7 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt || echo "No dependencies"
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run autograding
         id: grade
@@ -27,7 +30,19 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: autograde-report
-          path: output/results.json
+          path: results.json
 
-      - name: Set workflow exit code
-        run: exit $?
+      - name: Upload results to central repo
+        run: |
+          STUDENT=$(basename "$GITHUB_REPOSITORY")
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
+
+          curl -X PUT \
+            -H "Authorization: Bearer $RESULTS_REPO_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data-binary @results.json \
+            "https://api.github.com/repos/Laurea-ammattikorkeakoulu-Tikkurila/linux-assignments-autogradings-repo/contents/${STUDENT}-${TIMESTAMP}.json"
+
+      - name: Fail workflow if grading failed
+        if: steps.grade.outcome == 'failure'
+        run: exit 1
