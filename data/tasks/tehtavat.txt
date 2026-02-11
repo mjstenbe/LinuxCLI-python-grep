@@ -1,5 +1,5 @@
 --- GREP- harjoituksia
-# Etsi kaikkien asiakkaiden etunimet tiedostosta data/asiakastiedot.txt
+# Etsi kaikkien asiakkaiden etunimen sisältävät rivit tiedostosta data/asiakastiedot.txt
 grep '^Asiakas:' data/asiakastiedot.txt 
 
 # Etsi pelkät puhelinnumerot tiedostosta data/asiakastiedot.txt (huomaa että muoto vaihtelee)
