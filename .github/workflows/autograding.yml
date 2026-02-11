@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: autograde-report
-          path: results.json
+          path: output/results.json
 
       - name: Upload results to central repo
         run: |
