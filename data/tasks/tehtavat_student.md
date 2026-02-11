@@ -2,7 +2,7 @@
 
 Seuraavat tehtävät — vastaukset jätetty pois.
 
-1. Etsi kaikkien asiakkaiden etunimet tiedostosta data/asiakastiedot.txt
+1. Etsi kaikkien asiakkaiden etunimen sisältävät rivit tiedostosta data/asiakastiedot.txt
 2. Etsi pelkät puhelinnumerot tiedostosta data/asiakastiedot.txt (huomaa että muoto vaihtelee)
 3. Etsi suomalaiset sosiaaliturvatunnukset tiedostosta data/asiakastiedot.txt
 4. Etsi kaikki IPv4-osoitteet tiedostosta data/asiakastiedot.txt. Riittää että löydät oikein muotoiset numerosarjat (esim. 123.123.123.123).
