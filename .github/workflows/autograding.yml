@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: autograde-report
-          path: autograde_report.json
+          path: output/results.json
 
       - name: Set workflow exit code
         run: exit $?

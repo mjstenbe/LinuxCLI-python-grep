@@ -4,33 +4,33 @@
   "per_task": [
     {
       "id": 0,
-      "status": "väärin",
-      "student_cmd": "grep -E '[0-9]{6}[-A-Z][0-9]{3}[0-9A-Z]' data/sotuja.txt"
+      "status": "ei_vastattu",
+      "student_cmd": null
     },
     {
       "id": 1,
-      "status": "väärin",
-      "student_cmd": "grep -E 'asianajaja|poliisi|lääkäri' data/kirja.txt"
+      "status": "ei_vastattu",
+      "student_cmd": null
     },
     {
       "id": 2,
-      "status": "väärin",
-      "student_cmd": "grep 'Tohtori Jekyll' data/kirja.txt | wc -l"
+      "status": "ei_vastattu",
+      "student_cmd": null
     },
     {
       "id": 3,
-      "status": "väärin",
-      "student_cmd": "grep -n -v -E 'elämä|ei|kuolema' data/kirja.txt | wc -l"
+      "status": "ei_vastattu",
+      "student_cmd": null
     },
     {
       "id": 4,
-      "status": "väärin",
-      "student_cmd": "grep 'Error' data/log.txt"
+      "status": "ei_vastattu",
+      "student_cmd": null
     },
     {
       "id": 5,
-      "status": "väärin",
-      "student_cmd": "grep -i 'warning' data/log.txt"
+      "status": "ei_vastattu",
+      "student_cmd": null
     },
     {
       "id": 6,
@@ -39,13 +39,13 @@
     },
     {
       "id": 7,
-      "status": "väärin",
-      "student_cmd": "grep -E '\\b[A-Z][a-zA-Z]*\\.' data/kirja.txt"
+      "status": "ei_vastattu",
+      "student_cmd": null
     },
     {
       "id": 8,
-      "status": "väärin",
-      "student_cmd": "grep 'login successful' data/log.txt | grep '08:' | wc -l"
+      "status": "ei_vastattu",
+      "student_cmd": null
     },
     {
       "id": 9,
