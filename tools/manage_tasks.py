@@ -21,7 +21,7 @@ import os
 
 ENC_FILE = "data/tasks/tehtavat.txt.enc"
 PLAIN_FILE = "data/tasks/tehtavat.txt"
-STUDENT_MD = "data/tasks/tehtavat_student.md"
+STUDENT_MD = "./tehtavat_student.md"
 
 
 def decrypt():
