@@ -40,7 +40,7 @@ jobs:
           curl -X PUT \
             -H "Authorization: Bearer $RESULTS_REPO_TOKEN" \
             -H "Content-Type: application/json" \
-            --data-binary @results.json \
+            --data-binary @output/results.json \
             "https://api.github.com/repos/Laurea-ammattikorkeakoulu-Tikkurila/linux-assignments-autogradings-repo/contents/${STUDENT}-${TIMESTAMP}.json"
 
       - name: Fail workflow if grading failed

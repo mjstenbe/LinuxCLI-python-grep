@@ -1,7 +1,7 @@
 # Selväkieliset kysymykset jätetään pois opiskelijan reposta, mutta ne voidaan pitää omassa repossaan. Näin opiskelija ei näe kysymyksiä, mutta opettaja voi silti käyttää niitä arviointiin.
-data/*.txt
+./data/*.txt
 # tools hakemiston työkaluja ei jaeta opiskelijalle
-tools/*
+./tools/*
 
 # osa config tiedostoista pysyy salaisena                                        
 # config/tila.json
