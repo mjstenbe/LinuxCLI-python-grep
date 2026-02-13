@@ -52,7 +52,7 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             -d "$(jq -nc --arg msg "Add autograding result for ${STUDENT}" --arg content "$CONTENT" '{message: $msg, content: $content}')" \
-            "https://api.github.com/repos/Laurea-ammattikorkeakoulu-Tikkurila/linux-assignments-autogradings-repo/contents/${TARGET_FILE}"
+            "https://api.github.com/repos/mjstenbe/linux-assignments-autogradings-repo/contents/${TARGET_FILE}"
 
       - name: Fail workflow if grading failed
         if: steps.grade.outcome == 'failure'
