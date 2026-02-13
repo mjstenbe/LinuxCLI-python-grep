@@ -42,7 +42,9 @@ jobs:
             exit 0
           fi
 
-          STUDENT=$(basename "$GITHUB_REPOSITORY")
+          # Käytä ensisijaisesti käyttäjätunnusta (actor), jotta nimi on muotoa opiskelija-YYYY-MM-DDTHH-MM-SS.json
+          STUDENT_RAW="${GITHUB_ACTOR:-$(basename "$GITHUB_REPOSITORY")}" 
+          STUDENT=$(printf '%s' "$STUDENT_RAW" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/^-+|-+$//g')
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
           TARGET_FILE="${STUDENT}-${TIMESTAMP}.json"
           CONTENT=$(base64 -w 0 output/results.json)
