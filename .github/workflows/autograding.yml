@@ -33,15 +33,26 @@ jobs:
           path: output/results.json
 
       - name: Upload results to central repo
+        if: github.event_name == 'push'
         run: |
+          set -euo pipefail
+
+          if [ -z "${RESULTS_REPO_TOKEN:-}" ]; then
+            echo "RESULTS_REPO_TOKEN is not set. Skipping upload."
+            exit 0
+          fi
+
           STUDENT=$(basename "$GITHUB_REPOSITORY")
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
+          TARGET_FILE="${STUDENT}-${TIMESTAMP}.json"
+          CONTENT=$(base64 -w 0 output/results.json)
 
-          curl -X PUT \
+          curl --fail-with-body -X PUT \
             -H "Authorization: Bearer $RESULTS_REPO_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data-binary @output/results.json \
-            "https://api.github.com/repos/Laurea-ammattikorkeakoulu-Tikkurila/linux-assignments-autogradings-repo/contents/${STUDENT}-${TIMESTAMP}.json"
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -d "$(jq -nc --arg msg "Add autograding result for ${STUDENT}" --arg content "$CONTENT" '{message: $msg, content: $content}')" \
+            "https://api.github.com/repos/Laurea-ammattikorkeakoulu-Tikkurila/linux-assignments-autogradings-repo/contents/${TARGET_FILE}"
 
       - name: Fail workflow if grading failed
         if: steps.grade.outcome == 'failure'
