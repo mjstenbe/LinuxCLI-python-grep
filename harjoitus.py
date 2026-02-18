@@ -147,11 +147,45 @@ def tallenna_tila(tila):
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(tila, ensure_ascii=False, indent=2), encoding='utf-8')
 
+
+def varmista_opiskelijatiedot(tila: Dict[str, Any], kysy_kayttajalta: bool = False) -> Dict[str, Any]:
+    """Varmista, että tilassa on opiskelijan nimi ja opiskelijanumero."""
+    nimi = tila.get("nimi")
+    opiskelijanumero = tila.get("opiskelijanumero")
+
+    if not kysy_kayttajalta:
+        return {
+            "nimi": nimi or "",
+            "opiskelijanumero": opiskelijanumero or ""
+        }
+
+    if not nimi:
+        while True:
+            nimi = input("👤 Anna nimesi: ").strip()
+            if nimi:
+                tila["nimi"] = nimi
+                break
+            print("⚠️  Nimi ei voi olla tyhjä.")
+
+    if not opiskelijanumero:
+        while True:
+            opiskelijanumero = input("🆔 Anna opiskelijanumerosi: ").strip()
+            if opiskelijanumero:
+                tila["opiskelijanumero"] = opiskelijanumero
+                break
+            print("⚠️  Opiskelijanumero ei voi olla tyhjä.")
+
+    return {
+        "nimi": tila.get("nimi", ""),
+        "opiskelijanumero": tila.get("opiskelijanumero", "")
+    }
+
 # ---------- CI / CHECK ----------
 
 def check_mode():
     tehtavat = lue_tehtavat(TEHTAVAT_TIEDOSTO)
     tila = lataa_tila()
+    opiskelijatiedot = varmista_opiskelijatiedot(tila, kysy_kayttajalta=False)
 
     oikein = 0
     yhteensa = len(tehtavat)
@@ -204,7 +238,13 @@ def check_mode():
             student_cmd = None
         per_task.append({"id": i, "status": status, "student_cmd": student_cmd})
 
-    results = {"score": oikein, "total": yhteensa, "per_task": per_task}
+    results = {
+        "nimi": opiskelijatiedot["nimi"],
+        "opiskelijanumero": opiskelijatiedot["opiskelijanumero"],
+        "score": oikein,
+        "total": yhteensa,
+        "per_task": per_task,
+    }
 
     # Kirjoita tulos tiedostoon ja stdoutiin
     try:
@@ -229,6 +269,13 @@ def check_mode():
 def interactive_mode():
     tehtavat = lue_tehtavat(TEHTAVAT_TIEDOSTO)
     tila = lataa_tila()
+    tila_olemassa = Path(TILA_TIEDOSTO).exists()
+
+    # Pyydä opiskelijatiedot heti, jos tila.json luodaan ensimmäistä kertaa
+    varmista_opiskelijatiedot(tila, kysy_kayttajalta=True)
+    if not tila_olemassa:
+        tallenna_tila(tila)
+
     skipped_this_session = set()
 
     def is_completed(task_id):
