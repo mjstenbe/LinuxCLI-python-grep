@@ -60,6 +60,8 @@ jobs:
           TARGET_FILE="${STUDENT}-${TIMESTAMP}.json"
           CONTENT=$(base64 -w 0 output/results.json)
 
+          echo "Upload target filename: ${TARGET_FILE}"
+
           curl --fail-with-body -X PUT \
             -H "Authorization: Bearer $RESULTS_REPO_TOKEN" \
             -H "Accept: application/vnd.github+json" \
