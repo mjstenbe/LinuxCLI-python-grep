@@ -42,9 +42,20 @@ jobs:
             exit 0
           fi
 
-          # Käytä ensisijaisesti käyttäjätunnusta (actor), jotta nimi on muotoa opiskelija-YYYY-MM-DDTHH-MM-SS.json
-          STUDENT_RAW="${GITHUB_ACTOR:-$(basename "$GITHUB_REPOSITORY")}" 
-          STUDENT=$(printf '%s' "$STUDENT_RAW" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/^-+|-+$//g')
+          # Käytä ensisijaisesti results.jsoniin tallennettua opiskelijanumeroa tiedostonimessä.
+          STUDENT_NUMBER_RAW=$(jq -r '.opiskelijanumero // empty' output/results.json)
+          if [ -n "$STUDENT_NUMBER_RAW" ]; then
+            STUDENT=$(printf '%s' "$STUDENT_NUMBER_RAW" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/^-+|-+$//g')
+          else
+            # Varmistus: jos opiskelijanumero puuttuu, käytä aiempaa fallbackia.
+            STUDENT_RAW="${GITHUB_ACTOR:-$(basename "$GITHUB_REPOSITORY")}" 
+            STUDENT=$(printf '%s' "$STUDENT_RAW" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/^-+|-+$//g')
+          fi
+
+          if [ -z "$STUDENT" ]; then
+            STUDENT="unknown-student"
+          fi
+
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
           TARGET_FILE="${STUDENT}-${TIMESTAMP}.json"
           CONTENT=$(base64 -w 0 output/results.json)
@@ -56,6 +67,8 @@ jobs:
             -d "$(jq -nc --arg msg "Add autograding result for ${STUDENT}" --arg content "$CONTENT" '{message: $msg, content: $content}')" \
             "https://api.github.com/repos/mjstenbe/linux-assignments-autogradings-repo/contents/${TARGET_FILE}"
 
-      - name: Fail workflow if grading failed
+      - name: Report grading status
         if: steps.grade.outcome == 'failure'
-        run: exit 1
+        run: |
+          echo "⚠️ Autograding reported incomplete/incorrect answers (expected for unfinished submissions)."
+          echo "Results were still uploaded when token was available."
