@@ -148,16 +148,37 @@ def tallenna_tila(tila):
     p.write_text(json.dumps(tila, ensure_ascii=False, indent=2), encoding='utf-8')
 
 
+def paivita_results_opiskelijatiedot(opiskelijatiedot: Dict[str, str]) -> None:
+    """Kirjoita nimi ja opiskelijanumero results.json-tiedostoon."""
+    p = Path(RESULTS_FILE)
+    p.parent.mkdir(parents=True, exist_ok=True)
+
+    nykyinen: Dict[str, Any] = {}
+    if p.exists():
+        try:
+            nykyinen = json.loads(p.read_text(encoding='utf-8'))
+            if not isinstance(nykyinen, dict):
+                nykyinen = {}
+        except Exception:
+            nykyinen = {}
+
+    nykyinen["nimi"] = opiskelijatiedot.get("nimi", "")
+    nykyinen["opiskelijanumero"] = opiskelijatiedot.get("opiskelijanumero", "")
+    p.write_text(json.dumps(nykyinen, ensure_ascii=False, indent=2), encoding='utf-8')
+
+
 def varmista_opiskelijatiedot(tila: Dict[str, Any], kysy_kayttajalta: bool = False) -> Dict[str, Any]:
     """Varmista, että tilassa on opiskelijan nimi ja opiskelijanumero."""
     nimi = tila.get("nimi")
     opiskelijanumero = tila.get("opiskelijanumero")
 
     if not kysy_kayttajalta:
-        return {
+        opiskelijatiedot = {
             "nimi": nimi or "",
             "opiskelijanumero": opiskelijanumero or ""
         }
+        paivita_results_opiskelijatiedot(opiskelijatiedot)
+        return opiskelijatiedot
 
     if not nimi:
         while True:
@@ -175,10 +196,12 @@ def varmista_opiskelijatiedot(tila: Dict[str, Any], kysy_kayttajalta: bool = Fal
                 break
             print("⚠️  Opiskelijanumero ei voi olla tyhjä.")
 
-    return {
+    opiskelijatiedot = {
         "nimi": tila.get("nimi", ""),
         "opiskelijanumero": tila.get("opiskelijanumero", "")
     }
+    paivita_results_opiskelijatiedot(opiskelijatiedot)
+    return opiskelijatiedot
 
 # ---------- CI / CHECK ----------
 
