@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      RESULTS_REPO_TOKEN: ${{ secrets.RESULTS_REPO_TOKEN }}
+      RESULTS_REPO_TOKEN: ${{ secrets.RESULTS_REPO_TOKEN || secrets.AUTOGRADING_RESULTS_REPO_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +38,10 @@ jobs:
           set -euo pipefail
 
           if [ -z "${RESULTS_REPO_TOKEN:-}" ]; then
-            echo "RESULTS_REPO_TOKEN is not set. Skipping upload."
+            echo "RESULTS_REPO_TOKEN is not set in this repository context. Skipping upload."
+            echo "Hint: secrets do not propagate from a target repository or from parent/template repos to forks."
+            echo "Set RESULTS_REPO_TOKEN (or AUTOGRADING_RESULTS_REPO_TOKEN) in the repo where this workflow runs."
+            echo "Running repo: ${GITHUB_REPOSITORY}"
             exit 0
           fi
 
