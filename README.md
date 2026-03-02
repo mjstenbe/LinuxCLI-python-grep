@@ -24,3 +24,20 @@ python3 tools/summarize_autograding_results.py --results-dir . --output SUMMARY.
 
 Skripti lukee kentät `score` ja `total` ja tuottaa Markdown-taulukon, jossa näkyy opiskelija,
 pistekertymä ja viimeisimmän tuloksen aikaleima.
+
+## CI-vianmääritys: `RESULTS_REPO_TOKEN is not set`
+
+Jos GitHub Actions -lokissa näkyy viesti
+`RESULTS_REPO_TOKEN is not set. Skipping upload.`, token ei ole saatavilla siinä
+repossa, jossa workflow ajetaan.
+
+Tärkeä huomio:
+- Secretit **eivät** siirry automaattisesti template-/parent-reposta forkkeihin.
+- Secretit **eivät** tule käyttöön toisesta (kohde-)reposta, vaikka upload menisikin sinne.
+
+Korjaus:
+1. Aseta secret `RESULTS_REPO_TOKEN` (tai vaihtoehtoisesti `AUTOGRADING_RESULTS_REPO_TOKEN`)
+   **siihen repositoryyn, jossa autograding-workflow pyörii**.
+2. Varmista, että tokenilla on oikeudet kirjoittaa kohderepoon
+   (`Contents: Read and write`).
+3. Aja workflow uudelleen `push`-eventillä (upload-vaihe ajetaan vain pushissa).
